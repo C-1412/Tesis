@@ -16,7 +16,7 @@
                 <div class="row">
                     {% for escala in escalas %}
                         <div class="col-md-6">
-                            <p class="text-center"><strong>{{ escala.name }}</strong></p>
+                            <p class="text-center"> <strong data-bs-toggle="tooltip" title="{{ escala.desc }}">{{ escala.name }}</strong></p>
                             <div class="form-group">
                                 <!-- Valor 1 -->
                                 <div class="form-check mb-2">
@@ -60,4 +60,12 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
 {% endblock %}
