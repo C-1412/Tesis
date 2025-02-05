@@ -1,0 +1,46 @@
+{% extends 'list.html' %}
+{% load static %}
+
+{% block head_list %}
+    <script src="{% static 'limpiar/js/list.js' %}"></script>
+{% endblock %}
+
+{% block buttons_list %}
+    <div class="container mt-2">
+        <form method="GET" action="{% url 'erp:limpiar_list' %}" id="filterForm">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="filter-area">Área:</label>
+                    <select id="filter-area" class="form-control">
+                        <option value="">Todas</option>
+                        {% for area in areas %}
+                            <option value="{{ area.id }}">{{ area.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <a href="{% url 'erp:limpiar_list' %}" class="btn btn-secondary">Restablecer</a>
+            <button id="select-all" type="button" class="btn btn-success">Seleccionar Todos</button>
+            <button id="clear-responses"  class="btn btn-danger" >Limpiar Respuestas</button>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block columns %}
+    <tr>
+        <th scope="col" style="width: 45%;">Nombre</th>
+        <th scope="col" style="width: 40%;">Área</th>
+        <th scope="col" style="width: 5%;">Seleccionar</th>
+    </tr>
+{% endblock %}
+
+{% block rows %}
+
+{% endblock %}
+
+
+
+{% block javascript %}
+    <script src="{% static 'limpiar/js/list.js' %}"></script>
+{% endblock %}

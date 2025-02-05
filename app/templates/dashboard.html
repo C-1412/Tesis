@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block head %}
+    <script src="{% static 'lib/highcharts-8.1.2/highcharts.js' %}"></script>
+    <script src="{% static 'lib/highcharts-8.1.2/modules/exporting.js' %}"></script>
+    <script src="{% static 'lib/highcharts-8.1.2/modules/export-data.js' %}"></script>
+    <script src="{% static 'lib/highcharts-8.1.2/modules/accessibility.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+
+{% if not request.session.is_usuario_group %}
+
+<div class="container-fluid">
+    <div class="jumbotron bg-transparent text-center" style="background-color: rgba(255, 255, 255, 0.8); margin: 0; padding: 10px;">
+        <img src="{% static 'img/banner.jpg' %}" class="img-fluid mb-1" style="max-width: 30%; height: auto;" alt="Banner">
+        <h1 class="display-8 text-dark" style="text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); margin: 0;">Sistema Informativo para Gestión de Intangibles</h1>
+        <p class="lead text-dark display-4" style="text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); margin: 0;">SIGI</p>
+        <hr class="my-4" style="margin: 10px 0;">
+    </div>
+</div>
+{% else %}
+
+{% if '/erp/dashboard/' in request.path and not request.GET %}
+<div class="container-fluid bg-transparent">
+    <div class="card p-3 bg-transparent text-dark text-center">
+        <h2>Instrucciones para responder</h2>
+        <hr class="my-4">
+        <div class="col-lg-12 text-center">
+            <div style="font-weight: bold; text-decoration: underline;">Estimado(a) participante,</div>
+            <div>
+                Este cuestionario tiene el objetivo de caracterizar la participación laboral y organizacional (PLO) de los colectivos en la gestión de la empresa donde Ud. labora. Tiene carácter anónimo y la información recopilada solo se utiliza con fines científicos, sin repercusión para su desempeño laboral. La confiabilidad de los resultados depende de su sinceridad al responder.
+            </div>
+            <br>
+            <div style="font-weight: bold; text-decoration: underline;">Instrucciones para responder:</div>
+            <div>
+                <span style="font-style: italic;">En su primera parte,</span> se presentan afirmaciones (ítem) acompañadas de dos columnas a su derecha. La primera columna (A), es para indicar el grado de aplicación o cumplimiento de cada afirmación en la actual gestión de la empresa. La segunda columna (B), es para indicar el nivel de importancia de cada afirmación en el cumplimiento de los objetivos y metas estratégicas de la empresa.
+            </div>
+            <br>
+            <div>
+                <span style="font-style: italic;">La segunda parte del cuestionario,</span> igualmente presenta afirmaciones (ítem), acompañadas de dos columnas a su derecha. La primera columna (C), es para indicar el grado de aplicación o cumplimiento de cada afirmación en la actual gestión de la empresa. La segunda columna (D), es para indicar el nivel de importancia de cada afirmación para que Ud. y el colectivo alcancen una participación e implicación más espontánea en la gestión de la empresa.
+            </div>
+            <br>
+            <div>
+                <span style="font-weight: normal;">No existen respuestas correctas o incorrectas, pues solo reflejan la manera particular de percibir su ámbito laboral. Siéntase en libertad de decidir por la puntuación que mejor refleje su forma de pensar y sentir. La valoración debe hacerla atendiendo a la siguiente escala:</span>
+            </div>
+            <br>
+            
+            <!-- Contenedor centrado y mitad del tamaño -->
+            <div class="row justify-content-center">
+                <div class="col-md-3">
+                    <table class="table table-bordered table-striped table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Valor</th>
+                                <th>Significado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Muy Bajo</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Bajo</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Medio</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Alto</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Muy Alto</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 card p-3" style="background-color: #F2F8F6; border: 1px solid #b8d8e7;">
+            {% include 'questions/index.html' %}
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endif %}
+
+{% endblock %}

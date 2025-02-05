@@ -1,0 +1,92 @@
+{% extends 'list.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block buttons_list %}
+<div class="container mt-2">
+    <form method="GET" action="{% url 'erp:datos_list' %}" id="filterForm">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="dominio">Dominio:</label>
+                <select name="dominio" id="dominio" class="form-control">
+                    <option value="">Todos</option>
+                    {% for dominio in dominios %}
+                        <option value="{{ dominio.id }}" {% if dominio.id|stringformat:"s" == request.GET.dominio|default_if_none:""|stringformat:"s" %} selected {% endif %}>
+                            {{ dominio.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label for="dimension">Dimensión:</label>
+                <select name="dimension" id="dimension" class="form-control">
+                    <option value="">Todas</option>
+                    {% for dimension in dimensions %}
+                        <option value="{{ dimension.id }}" {% if dimension.id|stringformat:"s" == request.GET.dimension|default_if_none:""|stringformat:"s" %} selected {% endif %}>
+                            {{ dimension.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <a href="{% url 'erp:datos_list' %}" class="btn btn-secondary">Restablecer</a>
+        <a href="{% url 'erp:datos_pdf' %}?dimension={{ request.GET.dimension }}&dominio={{ request.GET.dominio }}" class="btn btn-danger">Exportar a PDF</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block columns %}
+    {% if questions %}
+        <tr>
+            <th scope="col">Pregunta</th>
+            <th scope="col">Usuarios</th>
+            <th scope="col">Escalas y Puntuaciones</th>
+        </tr>
+        <tbody>
+            {% for question in questions %}
+                <tr>
+                    <td>{{ question.question_text }}</td>
+                    <td>{{ question.answered_users_count }} / {{ question.total_users_count }}</td>
+                    <td>
+                        {% if question.escala_votes %}
+                            <ul class="list-unstyled">
+                                {% for item in question.escala_votes.values %}
+                                    <li>
+                                        <strong>{{ item.escala }}</strong>
+                                        <ul>
+                                            {% for score, count in item.votes.items %}
+                                                <li>Voto: {{ score }} – Total: {{ count }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No hay votos</p>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% else %}
+        <p>No hay preguntas disponibles.</p>
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var dominioSelect = document.getElementById('dominio');
+        var dimensionSelect = document.getElementById('dimension');
+
+        dominioSelect.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+
+        dimensionSelect.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+</script>
+{% endblock %}

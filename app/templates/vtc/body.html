@@ -1,0 +1,76 @@
+{% extends 'home.html' %}
+{% block body %}
+    <body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Header -->
+        {% include 'vtc/header.html' %}
+        <!-- Sidebar -->
+        {% include 'vtc/sidebar.html' %}
+        <!-- Content -->
+        <div class="content-wrapper">
+            
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6 my-2">
+                            <h1 class="m-0 text-dark"> Bienvenido <small>{{ request.user.get_username }}</small></h1>
+                        </div>
+                        {% comment "" %}
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="{% url 'erp:dashboard' %}">Inicio</a></li>
+                                <li class="breadcrumb-item"><a href="{{ list_url }}">{{ entity }}</a></li>
+                            </ol>
+                        </div>
+                        {% endcomment %}
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="container-fluid">
+                    {% block content %}
+
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        {% include 'footer.html' %}
+    </div>
+    <!-- Block javascript -->
+    {% block javascript %}
+
+    {% endblock %}
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                var html = '{{ message }}';
+                var icon = 'info';  // Por defecto, asumimos que el mensaje es informativo
+    
+                // Verifica el tipo de mensaje para asignar el ícono correspondiente
+                {% if message.tags == 'error' %}
+                    var title = 'Error!';
+                    icon = 'error';
+                {% elif message.tags == 'success' %}
+                    var title = '¡Éxito!';
+                    icon = 'success';
+                {% elif message.tags == 'warning' %}
+                    var title = 'Advertencia!';
+                    icon = 'warning';
+                {% else %}
+                    var title = 'Informacion!';
+                    icon = 'info';
+                {% endif %}
+    
+                Swal.fire({
+                    title: title,
+                    html: html,
+                    icon: icon
+                });
+            {% endfor %}
+        {% endif %}
+    </script>
+    </body>
+{% endblock %}

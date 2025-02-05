@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        /* Estilos básicos para la tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 5px 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        /* Estilos para las listas dentro de la tabla */
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        li {
+            margin: 0;
+            padding: 0;
+        }
+        .titulo {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="titulo">{{ title }}</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Pregunta</th>
+                <th>Usuarios</th>
+                <th>Escalas y Puntuaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for question in questions %}
+                <tr>
+                    <td>{{ question.question_text }}</td>
+                    <td>{{ question.answered_users_count }} / {{ question.total_users_count }}</td>
+                    <td>
+                        {% if question.escala_votes %}
+                            <ul>
+                                {% for item in question.escala_votes.values %}
+                                    <li>
+                                        <strong>{{ item.escala }}</strong>
+                                        <ul>
+                                            {% for score, count in item.votes.items %}
+                                                <li>Voto: {{ score }} – Total: {{ count }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            No hay votos
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

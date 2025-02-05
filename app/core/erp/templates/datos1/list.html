@@ -1,0 +1,84 @@
+{% extends 'list.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block buttons_list %}
+<div class="container mt-2">
+    <form method="GET" action="{% url 'erp:datos_area_list' %}" id="filterForm">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="area">Área:</label>
+                <select name="area" id="area" class="form-control">
+                    <option value="">Todas</option>
+                    {% for area in areas %}
+                        <option value="{{ area.id }}" {% if area.id|stringformat:"s" == selected_area_id|stringformat:"s" %} selected {% endif %}>{{ area.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <a href="{% url 'erp:datos_area_list' %}" class="btn btn-secondary">Restablecer</a>
+        <a href="{% url 'erp:datos_area_pdf' %}?area={{ selected_area_id }}" class="btn btn-danger">Exportar a PDF</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block columns %}
+<div class="container mt-4">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Área</th>
+                <th scope="col">Pregunta</th>
+                <th scope="col">Usuarios / Total</th>
+                <th scope="col">Puntuaciones por Escala</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for area in filtered_areas %}
+                {% for question in area.questions %}
+                    <tr>
+                        <td>{{ area.name }}</td>
+                        <td>{{ question.question_text }}</td>
+                        <td>{{ question.answered_users_count }} / {{ question.total_users_count }}</td>
+                        <td>
+                            {% if question.votes_by_escala %}
+                                {% for escala, votos in question.votes_by_escala.items %}
+                                    <strong>{{ escala }}</strong>
+                                    <ul class="list-unstyled">
+                                        {% for score, count in votos.items %}
+                                            <li>Puntuación: {{ score }} - Total: {{ count }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endfor %}
+                            {% else %}
+                                <p>No hay votos</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    {% if forloop.first %}
+                        <tr>
+                            <td>{{ area.name }}</td>
+                            <td colspan="3">No hay datos para esta área.</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            {% if not filtered_areas %}
+                <tr><td colspan="4">No hay áreas disponibles.</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var areaSelect = document.getElementById('area');
+        areaSelect.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+</script>
+{% endblock %}

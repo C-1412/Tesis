@@ -1,0 +1,48 @@
+{% if object_list %}
+    <h1 class="my-4">Preguntas</h1>
+    <ul class="list-group">
+    {% for question in object_list %}
+        <li class="list-group-item mb-3 shadow-sm bg-white rounded border border-white"
+            onmouseover="this.classList.add('border-primary')"
+            onmouseout="this.classList.remove('border-primary')"
+            style="transition: border-color 0.3s ease; border-color: transparent;"
+            {% if not answers_completed %}
+                onclick="location.href='{% url 'questions:question_detail' question.id %}'">
+            {% endif %}
+            {% if answers_completed %}
+                <span class="answered-icon text-success mr-2">
+                    <i class="fas fa-check-circle" style="color: green;"></i>
+                </span>
+                <span class="text-primary ml-2">{{ question.question_text }}</span>
+            {% else %}
+                {% for key, value in user_answered_questions.items %}
+                    {% if key == question.id %}
+                        {% if value %}
+                            <span class="answered-icon text-success mr-2">
+                                <i class="fas fa-check-circle" style="color: blue;"></i>
+                            </span>
+                            <span class="text-primary">{{ question.question_text }}</span>
+                        {% else %}
+                            <span class="text-primary">{{ question.question_text }}</span>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </li>
+    {% endfor %} 
+    </ul>
+{% else %}
+    <h1 class="my-4">No hay preguntas</h1>
+{% endif %}
+
+<style>
+    {% if answers_completed %}
+    .border-primary {
+        border-color: #dc3545  !important;
+    }
+    {% else %}
+    .border-primary {
+        border-color: #007bff !important;
+    }
+    {% endif %}
+</style>

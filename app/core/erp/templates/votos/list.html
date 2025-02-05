@@ -1,0 +1,74 @@
+{% extends 'list.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block buttons_list %}
+<div class="row float-right mt-3">
+    <div class="col-auto">
+        <button id="check-all" class="btn btn-primary">Marcar/Desmarcar</button>
+    </div>
+    <div class="col-auto">
+        <button id="update-comp" class="btn btn-success">Aplicar</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block columns %}
+<tr>
+    <th scope="col" style="width: 85%">Pregunta</th>
+    <th scope="col" style="width: 15%">Comprobación</th>
+</tr>
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+    $(function () {
+        var table = $('#data').DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            deferRender: true,
+            ajax: {
+                url: window.location.pathname,
+                type: 'POST',
+                data: { 'action': 'searchdata' },
+                dataSrc: ''
+            },
+            columns: [
+                { data: 'question_text' },
+                { 
+                    data: 'id', 
+                    render: function(data, type, row) {
+                        return `
+                            <div class="text-center pr-5">
+                                <input type="checkbox" name="comp_${data}" value="false">
+                            </div>
+                        `;
+                    }
+                }
+            ]
+        });
+
+        $('#check-all').on('click', function () {
+            var checkboxes = table.cells().nodes().to$().find('input[type="checkbox"]');
+            checkboxes.prop('checked', !checkboxes.prop('checked'));
+        });
+
+        $('#update-comp').on('click', function () {
+            var data = [];
+            table.$('input[type="checkbox"]:checked').each(function () {
+                var name = $(this).attr('name');
+                var question_id = name.split('_')[1];
+                var comp_value = $(this).val();
+                data.push({ name: 'question_id', value: question_id });
+                data.push({ name: 'comp_value', value: comp_value });
+            });
+            data.push({ name: 'action', value: 'update_comp' });
+            $.post(window.location.pathname, data, function(response) {
+                location.reload();
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+{% load custom_filters %}
+{% block content %}
+<div class="container py-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="mb-4">
+                <h4>{{ object.dom }} / {{ object.cat }}</h4>
+            </div>
+            <div class="mb-4">
+                <h3>Pregunta: {{ object.question_text }}</h3>
+                <p class="text-muted">Indica el grado de acuerdo (1 a 5):</p>
+            </div>
+            <form method="post" action="{% url 'questions:question_detail' pk=object.pk %}">
+                {% csrf_token %}
+                <div class="row">
+                    {% for escala in escalas %}
+                        <div class="col-md-6">
+                            <p class="text-center"><strong>{{ escala.name }}</strong></p>
+                            <div class="form-group">
+                                <!-- Valor 1 -->
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="score_{{ escala.id }}" id="score_{{ escala.id }}_1" value="1"
+                                    {% if previous_scores|get_item:escala.id|stringformat:"s" == "1" %}checked{% endif %}>
+                                    <label class="form-check-label text-info" for="score_{{ escala.id }}_1">1. Muy Bajo</label>
+                                </div>
+                                <!-- Valor 2 -->
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="score_{{ escala.id }}" id="score_{{ escala.id }}_2" value="2"
+                                    {% if previous_scores|get_item:escala.id|stringformat:"s" == "2" %}checked{% endif %}>
+                                    <label class="form-check-label text-primary" for="score_{{ escala.id }}_2">2. Bajo</label>
+                                </div>
+                                <!-- Valor 3 -->
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="score_{{ escala.id }}" id="score_{{ escala.id }}_3" value="3"
+                                    {% if previous_scores|get_item:escala.id|stringformat:"s" == "3" %}checked{% endif %}>
+                                    <label class="form-check-label text-success" for="score_{{ escala.id }}_3">3. Medio</label>
+                                </div>
+                                <!-- Valor 4 -->
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="score_{{ escala.id }}" id="score_{{ escala.id }}_4" value="4"
+                                    {% if previous_scores|get_item:escala.id|stringformat:"s" == "4" %}checked{% endif %}>
+                                    <label class="form-check-label text-warning" for="score_{{ escala.id }}_4">4. Alto</label>
+                                </div>
+                                <!-- Valor 5 -->
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="score_{{ escala.id }}" id="score_{{ escala.id }}_5" value="5"
+                                    {% if previous_scores|get_item:escala.id|stringformat:"s" == "5" %}checked{% endif %}>
+                                    <label class="form-check-label text-danger" for="score_{{ escala.id }}_5">5. Muy Alto</label>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary mr-2">Responder</button>
+                    <a onclick="history.back();" class="btn btn-danger">Atrás</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

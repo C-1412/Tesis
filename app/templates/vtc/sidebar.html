@@ -1,0 +1,121 @@
+{% load static %}
+{% load custom_filters %}
+<aside class="main-sidebar sidebar-light-primary elevation-4">
+    <a href="{% url 'erp:dashboard' %}" class="brand-link">
+        <img src="{% static 'img/logo.png' %}" alt="AdminLTE Logo" class="brand-image" style="opacity: .8">
+        <span class="brand-text font-weight-light">SIGI</span>
+    </a>
+    <div class="sidebar">
+        <div class="user-panel mt-3 pb-3 mb-3 ml-2 d-flex align-items-center">
+            <div class="image">
+                <i class="fas fa-user mr-2"></i>
+            </div>
+            <div class="info">
+                <a href="#" class="d-block">{{ request.user.username }}</a>
+            </div>
+        </div>
+        {% if not request.session.is_usuario_group %}
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-header">Mantenimientos</li>
+                {% if request.session.is_gestor_group or request.session.is_administrador_group %}
+                <li class="nav-item">
+                    <a href="{% url 'erp:dominio_list' %}" class="nav-link" data-toggle="tooltip" title="Dominio">
+                        <i class="nav-icon fas fa-network-wired"></i>
+                        <p>Dominio</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'erp:category_list' %}" class="nav-link" data-toggle="tooltip" title="Categorías">
+                        <i class="nav-icon fas fa-truck-loading"></i>
+                        <p>Dimensión</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'erp:pregunta_list' %}" class="nav-link" data-toggle="tooltip" title="Gestionar Pregunta">
+                        <i class="nav-icon fas fa-edit"></i>
+                        <p>Gestionar Pregunta</p>
+                    </a>
+                </li>
+                {% comment %}
+                    
+
+                <li class="nav-item">
+                    <a href="{% url 'erp:votos_list' %}" class="nav-link" data-toggle="tooltip" title="Ver Votos">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>Ver Votos</p>
+                    </a>
+                </li>
+
+                {% endcomment %}
+                <li class="nav-item">
+                    <a href="{% url 'erp:datos_list' %}" class="nav-link" data-toggle="tooltip" title="Ver Datos">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>Ver Datos</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'erp:datos_area_list' %}" class="nav-link" data-toggle="tooltip" title="Ver Datos por Area">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>Ver Datos por Área</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'erp:limpiar_list' %}" class="nav-link" data-toggle="tooltip" title="Limpiar Respuestas">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>Limpiar Respuestas</p>
+                    </a>
+                </li>
+                {% endif %}
+                {% if request.session.is_moderador_group or request.session.is_administrador_group %}
+                <li class="nav-item">
+                    <a href="{% url 'user:user_list' %}" class="nav-link" data-toggle="tooltip" title="Usuarios">
+                        <i class="nav-icon fas fa-user-friends"></i>
+                        <p>Usuarios</p>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>   
+        </nav>
+        {% endif %}
+
+        {% if request.session.is_usuario_group%}
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" role="menu" data-accordion="false">
+                <li class="nav-header">Preguntas</li>
+                {% for dominio in dominios %}
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-network-wired"></i>
+                        <p>{{ dominio.name }}</p>
+                    </a>
+                    <ul class="nav" style="margin-left: 15px;">
+                        {% for categoria in dominio.category_set.all %}
+                        <li class="nav-item">
+                            <a href="{% url 'erp:dashboard' %}?dominio={{ dominio.id }}&categoria={{ categoria.id }}" class="nav-link" style="font-size: 0.9rem";>
+                                <p>-{{ categoria.sec }}</p>
+                                {% if categoria.id in section_counts %}
+                                {% with section_count=section_counts|get_item:categoria.id %}
+                                    <small class="text-muted">{{ section_count.answered_count }}/{{ section_count.total_count }}</small>
+                                {% endwith %}
+                            {% endif %}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        <div class="text-center mt-3">
+            <form method="post" action="{% url 'questions:completadas' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success mt-3 " {% if not all_questions_answered or answers_completed %}disabled{% endif %}>
+                    Finalizar Respuestas
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</aside>
+
