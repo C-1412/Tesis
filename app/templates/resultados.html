@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultados de Medias Paso a Paso</title>
+</head>
+<body>
+  <h1>Resultados Paso a Paso</h1>
+  {% for dimension in dimensions_data %}
+    <h2>Dimensión: {{ dimension.dimension_name }}</h2>
+    {% if dimension.dimension_mean %}
+      <p><strong>Media de la Dimensión:</strong> {{ dimension.dimension_mean }}</p>
+      <ul>
+        {% for question in dimension.questions %}
+          <li>
+            <strong>Pregunta:</strong> {{ question.question_text }} <br>
+            <strong>Media:</strong> {{ question.mean }} 
+            (Total de puntos: {{ question.total_score }} en {{ question.answers_count }} respuestas)
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay respuestas registradas en esta dimensión.</p>
+    {% endif %}
+  {% endfor %}
+  <hr>
+  <h2>Media Global: {{ final_mean }}</h2>
+</body>
+</html>

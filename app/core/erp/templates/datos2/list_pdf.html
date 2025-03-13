@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      margin: 20px;
+    }
+    .container {
+      width: 100%;
+      margin: 0 auto;
+    }
+    /* Usamos una tabla CSS para simular dos columnas */
+    .row {
+      display: table;
+      width: 100%;
+    }
+    .col-left, .col-right {
+      display: table-cell;
+      vertical-align: middle;
+      padding: 10px;
+    }
+    .col-left {
+      width: 40%;
+      border-right: 1px solid #ccc;
+    }
+    .col-right {
+      width: 60%;
+    }
+    /* Estilos para el gráfico de la matriz */
+    .graph-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      border: 1px solid #ccc;
+      margin: 0 auto;
+    }
+    .axis-x {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #000;
+    }
+    .axis-y {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      height: 100%;
+      width: 2px;
+      background: #000;
+    }
+    .indicator {
+      position: absolute;
+      background: #dc3545;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      transform: translate(-50%, -50%);
+    }
+    .label-y {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: bold;
+    }
+    .label-x {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    {% if promedio1 and promedio2 %}
+      <div class="row">
+        <!-- Columna izquierda: Resultados -->
+        <div class="col-left">
+          <h4>Resultados</h4>
+          <p><strong>Promedio Escala 1:</strong> {{ promedio1|floatformat:2 }}</p>
+          <p><strong>Promedio Escala 2:</strong> {{ promedio2|floatformat:2 }}</p>
+          <p><strong>Cuadrante:</strong> {{ cuadrante }}</p>
+          {% if indicador %}
+            <p><strong>Indicador asociado:</strong> {{ indicador.name }}</p>
+          {% endif %}
+          {% if selected_dimension %}
+            {% for dim in dimensions %}
+              {% if dim.id|stringformat:"s" == selected_dimension|stringformat:"s" %}
+                <p><strong>Dimensión seleccionada:</strong> {{ dim.name }}</p>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+        <!-- Columna derecha: Matriz -->
+        <div class="col-right">
+          <div class="graph-container">
+            <!-- Etiqueta del eje Y (Escala 2) en la parte inferior -->
+            <div class="label-y">
+              {% for escala in escalas %}
+                {% if escala.id|stringformat:"s" == selected_escala2|stringformat:"s" %}
+                  {{ escala.name }}
+                {% endif %}
+              {% endfor %}
+            </div>
+            <!-- Etiqueta del eje X (Escala 1) en el lado izquierdo -->
+            <div class="label-x">
+              {% for escala in escalas %}
+                {% if escala.id|stringformat:"s" == selected_escala1|stringformat:"s" %}
+                  {{ escala.name }}
+                {% endif %}
+              {% endfor %}
+            </div>
+            <!-- Ejes -->
+            <div class="axis-x"></div>
+            <div class="axis-y"></div>
+            <!-- Marcador del indicador -->
+            {% if indicador %}
+              <div class="indicator"
+                {% if cuadrante == 1 %}
+                  style="left:75%; top:25%;"
+                {% elif cuadrante == 2 %}
+                  style="left:25%; top:25%;"
+                {% elif cuadrante == 3 %}
+                  style="left:25%; top:75%;"
+                {% elif cuadrante == 4 %}
+                  style="left:75%; top:75%;"
+                {% else %}
+                  style="left:50%; top:50%;"
+                {% endif %}
+              >
+                {{ indicador.name }}
+              </div>
+            {% endif %}
+            {% if selected_dimension %}
+              {% for dim in dimensions %}
+                {% if dim.id|stringformat:"s" == selected_dimension|stringformat:"s" %}
+                  <!-- Marcador para la dimensión seleccionada -->
+                  <div class="indicator"
+                    {% if cuadrante == 1 %}
+                      style="left:75%; top:15%;"
+                    {% elif cuadrante == 2 %}
+                      style="left:25%; top:15%;"
+                    {% elif cuadrante == 3 %}
+                      style="left:25%; top:85%;"
+                    {% elif cuadrante == 4 %}
+                      style="left:75%; top:85%;"
+                    {% else %}
+                      style="left:50%; top:50%;"
+                    {% endif %}
+                  >
+                    {{ dim.name }}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p>Seleccione las opciones y presione "Aplicar" para ver la matriz.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

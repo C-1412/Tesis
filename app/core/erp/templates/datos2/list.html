@@ -1,0 +1,212 @@
+{% extends 'list.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block buttons_list %}
+<div class="container mt-2">
+  <form method="GET" action="{% url 'erp:datos_matriz_list' %}" id="filterForm">
+    <div class="form-row">
+      <!-- Dominio -->
+      <div class="form-group col-md-3">
+         <label for="dominio">Dominio:</label>
+         <select name="dominio" id="dominio" class="form-control">
+           <option value="">Todos</option>
+           {% for dom in dominios %}
+             <option value="{{ dom.id }}" {% if dom.id|stringformat:"s" == selected_dominio|stringformat:"s" %}selected{% endif %}>
+               {{ dom.name }}
+             </option>
+           {% endfor %}
+         </select>
+      </div>
+      <!-- Escala 1 -->
+      <div class="form-group col-md-3">
+         <label for="escala1">Escala 1:</label>
+         <select name="escala1" id="escala1" class="form-control" required>
+           <option value="">Seleccione Escala 1</option>
+           {% for escala in escalas %}
+             <option value="{{ escala.id }}" {% if escala.id|stringformat:"s" == selected_escala1|stringformat:"s" %}selected{% endif %}>
+               {{ escala.name }}
+             </option>
+           {% endfor %}
+         </select>
+      </div>
+      <!-- Escala 2 -->
+      <div class="form-group col-md-3">
+         <label for="escala2">Escala 2:</label>
+         <select name="escala2" id="escala2" class="form-control" required>
+           <option value="">Seleccione Escala 2</option>
+           {% for escala in escalas %}
+             <option value="{{ escala.id }}" {% if escala.id|stringformat:"s" == selected_escala2|stringformat:"s" %}selected{% endif %}>
+               {{ escala.name }}
+             </option>
+           {% endfor %}
+         </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <!-- Dimensión -->
+      <div class="form-group col-md-3">
+         <label for="dimension">Dimensión:</label>
+         <select name="dimension" id="dimension" class="form-control">
+           <option value="">Todas</option>
+           {% for dim in dimensions %}
+             <option value="{{ dim.id }}" {% if dim.id|stringformat:"s" == selected_dimension|stringformat:"s" %}selected{% endif %}>
+               {{ dim.name }}
+             </option>
+           {% endfor %}
+         </select>
+      </div>
+      <!-- Pregunta (aparece según la dimensión) -->
+      <div class="form-group col-md-3" id="preguntaDiv" {% if not selected_dimension %}style="display:none"{% endif %}>
+         <label for="pregunta">Pregunta:</label>
+         <select name="pregunta" id="pregunta" class="form-control">
+           <option value="">Todas</option>
+           {% for preg in questions %}
+             <option value="{{ preg.id }}" {% if preg.id|stringformat:"s" == selected_pregunta|stringformat:"s" %}selected{% endif %}>
+               {{ preg.question_text }}
+             </option>
+           {% endfor %}
+         </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Aplicar</button>
+    <a href="{% url 'erp:datos_matriz_list' %}" class="btn btn-secondary">Restablecer</a>
+    <a href="{% url 'erp:datos_matriz_pdf' %}?dimension={{ request.GET.dimension }}&dominio={{ request.GET.dominio }}&escala1={{ request.GET.escala1 }}&escala2={{ request.GET.escala2 }}&pregunta={{ request.GET.pregunta }}" class="btn btn-danger">Exportar a PDF</a>
+  </form>
+</div>
+{% endblock %}
+
+{% block columns %}
+<div class="container mt-4">
+  {% if promedio1 and promedio2 %}
+    <div class="row">
+      <!-- Columna izquierda: Resultados -->
+      <div class="col-md-4 d-flex align-items-center">
+        <div class="w-100">
+          <h4>Resultados:</h4>
+          <p><strong>Promedio Escala 1:</strong> {{ promedio1|floatformat:2 }}</p>
+          <p><strong>Promedio Escala 2:</strong> {{ promedio2|floatformat:2 }}</p>
+          <p><strong>Cuadrante:</strong> {{ cuadrante }}</p>
+          {% if indicador %}
+            <p><strong>Indicador asociado:</strong> {{ indicador.name }}</p>
+          {% endif %}
+          {% if selected_dimension %}
+            {% for dim in dimensions %}
+              {% if dim.id|stringformat:"s" == selected_dimension|stringformat:"s" %}
+                <p><strong>Dimensión seleccionada:</strong> {{ dim.name }}</p>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      <!-- Columna derecha: Matriz con etiquetas en borde -->
+      <div class="col-md-8">
+        <div class="position-relative mx-auto" style="width:400px; height:400px; border:1px solid #ccc;">
+          <!-- Etiqueta para eje Y (Escala 2) en la parte inferior -->
+          <div class="position-absolute" style="bottom:-30px; left:50%; transform: translateX(-50%);">
+            <span class="font-weight-bold">
+              {% for escala in escalas %}
+                {% if escala.id|stringformat:"s" == selected_escala2|stringformat:"s" %}
+                  {{ escala.name }}
+                {% endif %}
+              {% endfor %}
+            </span>
+          </div>
+          <!-- Etiqueta para eje X (Escala 1) en el lado izquierdo -->
+          <div class="position-absolute" style="left:-100px; top:50%; transform: translateY(-50%) rotate(-90deg);">
+            <span class="font-weight-bold">
+              {% for escala in escalas %}
+                {% if escala.id|stringformat:"s" == selected_escala1|stringformat:"s" %}
+                  {{ escala.name }}
+                {% endif %}
+              {% endfor %}
+            </span>
+          </div>
+          <!-- Dibujar eje X -->
+          <div class="position-absolute" style="top:50%; left:0; width:100%; height:2px; background:#000;"></div>
+          <!-- Dibujar eje Y -->
+          <div class="position-absolute" style="left:50%; top:0; height:100%; width:2px; background:#000;"></div>
+          {% if indicador %}
+            <!-- Marcador para el indicador según el cuadrante -->
+            <div class="position-absolute" style="
+              {% if cuadrante == 1 %}
+                left:75%; top:25%;
+              {% elif cuadrante == 2 %}
+                left:25%; top:25%;
+              {% elif cuadrante == 3 %}
+                left:25%; top:75%;
+              {% elif cuadrante == 4 %}
+                left:75%; top:75%;
+              {% else %}
+                left:50%; top:50%;
+              {% endif %}
+              transform: translate(-50%, -50%);
+              background: #dc3545;
+              color: #fff;
+              padding: 6px 12px;
+              border-radius: 4px;
+              font-weight: bold;
+            ">
+              {{ indicador.name }}
+            </div>
+          {% endif %}
+          {% comment %}Mostrar dimensión solo si no se seleccionó una pregunta{% endcomment %}
+          {% if selected_dimension and not selected_pregunta %}
+            {% for dim in dimensions %}
+              {% if dim.id|stringformat:"s" == selected_dimension|stringformat:"s" %}
+                <!-- Marcador para la dimensión seleccionada -->
+                <div class="position-absolute" style="
+                  {% if cuadrante == 1 %}
+                    left:75%; top:15%;
+                  {% elif cuadrante == 2 %}
+                    left:25%; top:15%;
+                  {% elif cuadrante == 3 %}
+                    left:25%; top:85%;
+                  {% elif cuadrante == 4 %}
+                    left:75%; top:85%;
+                  {% else %}
+                    left:50%; top:50%;
+                  {% endif %}
+                  transform: translate(-50%, -50%);
+                  background: #007bff;
+                  color: #fff;
+                  padding: 6px 12px;
+                  border-radius: 4px;
+                  font-weight: bold;
+                ">
+                  {{ dim.name }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p>Seleccione las opciones y presione "Aplicar" para ver la matriz.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var dominioSelect = document.getElementById('dominio');
+    var dimensionSelect = document.getElementById('dimension');
+    var preguntaDiv = document.getElementById('preguntaDiv');
+
+    dominioSelect.addEventListener('change', function(){
+         document.getElementById('filterForm').submit();
+    });
+
+    dimensionSelect.addEventListener('change', function(){
+         if(dimensionSelect.value === ""){
+             preguntaDiv.style.display = 'none';
+         } else {
+             preguntaDiv.style.display = 'block';
+         }
+         document.getElementById('filterForm').submit();
+    });
+});
+</script>
+{% endblock %}

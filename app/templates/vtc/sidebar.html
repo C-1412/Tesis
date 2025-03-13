@@ -55,6 +55,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{% url 'erp:datos_matriz_list' %}" class="nav-link" data-toggle="tooltip" title="Ver Datos por Matriz">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>Ver Datos por Matriz</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{% url 'erp:datos_area_list' %}" class="nav-link" data-toggle="tooltip" title="Ver Datos por Area">
                         <i class="nav-icon fas fa-building"></i>
                         <p>Ver Datos por Área</p>
@@ -74,6 +80,14 @@
                         <p>Usuarios</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="http://localhost:8000/erp/calcular-media/" class="nav-link" data-toggle="tooltip" title="Media">
+                        <i class="nav-icon fas fa-user-friends"></i>
+                        <p>Media</p>
+                    </a>
+                </li>
+
+
                 {% endif %}
             </ul>   
         </nav>

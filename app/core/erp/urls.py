@@ -9,6 +9,7 @@ from core.erp.views.votos.views import *
 from core.erp.views.indicador.views import *
 from core.erp.views.datos.views import *
 from core.erp.views.datos1.views import *
+from core.erp.views.datos2.views import *
 from core.erp.views.limpiar.views import *
 
 
@@ -57,6 +58,11 @@ urlpatterns = [
     #datos 1
     path('datos_area/list/', DatosAreaListView.as_view(), name='datos_area_list'),
     path('datos_area/pdf/', DatosAreaPDFView.as_view(), name='datos_area_pdf'),
+    #datos 2
+    path('datos_matriz/list/', DatosMatrizView.as_view(), name='datos_matriz_list'),
+    path('datos_matriz/pdf/', DatosMatrizPDFView.as_view(), name='datos_matriz_pdf'),
     #limpiar
     path('limpiar/list/', LimpiarDatosView.as_view(), name='limpiar_list'),
+    # prueba
+    path('calcular-media/', calcular_media_total, name='calcular_media_total'),
 ]   

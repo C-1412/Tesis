@@ -126,3 +126,53 @@ class DatosAreaPDFView(LoginRequiredMixin, View):
             return response
 
         return HttpResponse('Error al generar el PDF: %s' % pisa_status.err, status=400)
+
+def calcular_media_total(request):
+
+    dimensions_data = []      # Información por dimensión
+    dimension_means_list = [] # Lista de medias de dimensiones (para la media global)
+
+    # Iteramos sobre todas las dimensiones (Category)
+    for dimension in Category.objects.all():
+        question_data = []  # Información de cada pregunta dentro de la dimensión
+
+        # Obtener las preguntas que pertenecen a la dimensión
+        questions = Question.objects.filter(cat=dimension)
+        for question in questions:
+            # Obtener todas las respuestas para la pregunta (puedes filtrar con comp=True si lo requieres)
+            answers = Answer.objects.filter(question=question)
+            if answers.exists():
+                total_score = sum(answer.score for answer in answers if answer.score is not None)
+                count_scores = answers.count()
+                question_mean = total_score / count_scores
+                # Guardamos los datos de la pregunta
+                question_data.append({
+                    'question_text': question.question_text,
+                    'mean': question_mean,
+                    'answers_count': count_scores,
+                    'total_score': total_score,
+                })
+
+        # Si la dimensión tiene preguntas con respuestas, calcular la media de la dimensión
+        if question_data:
+            dimension_mean = sum(q['mean'] for q in question_data) / len(question_data)
+            dimension_means_list.append(dimension_mean)
+        else:
+            dimension_mean = None
+
+        # Agregar la información de la dimensión a la lista general
+        dimensions_data.append({
+            'dimension_name': dimension.name,
+            'questions': question_data,
+            'dimension_mean': dimension_mean,
+        })
+
+    # Calcular la media global (sólo con dimensiones que tienen respuesta)
+    final_mean = (sum(dimension_means_list) / len(dimension_means_list)
+                  if dimension_means_list else None)
+
+    context = {
+        'dimensions_data': dimensions_data,
+        'final_mean': final_mean,
+    }
+    return render(request, 'resultados.html', context)
